@@ -13,8 +13,9 @@ KEYWORDS = {'break', 'default', 'func', 'interface', 'select', 'case', 'defer', 
 
 class GoBuilder(BaseBuilder):
 
-    def __init__(self, package, out, version):
+    def __init__(self, package, generic, out):
         self._package = package
+        self._generic = generic
         self._out = out
 
     def _typeAsGo(self, c_type):
@@ -94,9 +95,16 @@ class GoBuilder(BaseBuilder):
         go_source = io.StringIO()
 
         c_source.write('#include <stddef.h>\n')
+        c_source.write('#include <stdlib.h>\n')
+        c_source.write('#include <string.h>\n')
+
         c_source.write('#include <mpi.h>\n\n')
         logging.info("Generating GO variables")
         for macro in sorted(info['macros'], key=lambda m: m['name']):
+            if not macro['var']:
+                c_source.write('typedef ' + macro['name'] + '\n #undef ' + macro['name'])
+                c_source.write('\n ' + macro['name'] + ';\n')
+                continue
             c_type = macro['type']
             c_source.write(self._c_dec(c_type, 'GO_' + macro['name']))
             c_source.write(' = ' + macro['name'] + ';\n')
@@ -170,6 +178,49 @@ func mpi_check(code C.int) error {
             go_source.write(')\n')
             go_source.write('}\n\n')
 
+        go_source.write("""
+type C_int64 = C.int64_t
+type C_int32 = C.int16_t
+type C_int16 = C.int32_t
+type C_int8 = C.int8_t
+
+func C_ArrayToString(array []C_char) string {
+    str := C.GoString(&array[0])
+    return strings.Clone(str)
+}
+
+func C_ArrayFromString(str string) []C_char {
+    array := make([]C_char, len(str)+1)
+    for i, c := range str {
+        array[i] = C_char(c)
+    }
+    array[len(str)] = '\\x00'
+    return array
+}        
+""")
+
+        if self._generic:
+            go_source.write("""
+func P[T any](ptr *T) unsafe.Pointer {
+    return unsafe.Pointer(ptr)
+}
+
+var none C_int
+
+func PA[T any](ptr *[]T) unsafe.Pointer {
+    if len(*ptr) > 0 {
+        return unsafe.Pointer(&((*ptr)[0]))
+    }
+    return unsafe.Pointer(&none)
+}
+
+func C_NULL() unsafe.Pointer { return unsafe.Pointer(nil) }
+
+func C_Memcpy(dest unsafe.Pointer, src unsafe.Pointer, size int) {
+    C.memcpy(dest, src, C.size_t(size))
+}    
+""")
+
         logging.info("Writing result")
         folder = os.path.join(os.path.abspath(self._out), self._package)
         os.makedirs(folder, exist_ok=True)
@@ -187,6 +238,7 @@ func mpi_check(code C.int) error {
             go_file.write('*/\nimport "C"\n')
             if unsafe:
                 go_file.write('import "unsafe"\n')
+            go_file.write('import "strings"\n')
             go_file.write('import "strconv"\n\n')
             go_file.write(go_types.getvalue())
             go_file.write('\n\n')

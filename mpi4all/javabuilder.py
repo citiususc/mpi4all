@@ -15,7 +15,7 @@ KEYWORDS = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "
 
 class JavaBuilder(BaseBuilder):
 
-    def __init__(self, class_name, package, out, lib_name, lib_out, version):
+    def __init__(self, class_name, package, out, lib_name, lib_out):
         self._class_name = class_name
         self._package = package
         self._out = out
@@ -88,6 +88,10 @@ class JavaBuilder(BaseBuilder):
             public long bytes(){{
                 return ms.byteSize();
             }}
+            
+            public void to(MemorySegment ms){{
+                ms.copyFrom(this.ms);
+            }}
         }}
 
         public static class C_string extends C_pointer<C_char>{{
@@ -107,10 +111,8 @@ class JavaBuilder(BaseBuilder):
             
             public void setString(String v){{
                 ms.setUtf8String(0, v);
-            }}
-                
+            }} 
         }}
-
 """.format(lib=self._lib_name))
 
     def build(self, info):
@@ -141,6 +143,9 @@ import java.lang.invoke.MethodHandle;
             'long': ('C_long', 'ValueLayout.JAVA_LONG', 'long'),
             'long long': ('C_long', 'ValueLayout.JAVA_LONG', 'long'),
         }
+        if 'MPI_Count' in info['types']:
+            classes['MPI_Count'] = classes[info['types']['MPI_Count']]
+
         class_template = """
         public static class {name} extends Type{{
 
@@ -158,6 +163,10 @@ import java.lang.invoke.MethodHandle;
             
             public static {name} alloc(MemorySession session){{
                 return new {name}(session.allocate({layout}));
+            }}
+            
+            public static {name} from(MemorySession session, MemorySegment ms){{
+                return new {name}(session.allocate(ms.byteSize()).copyFrom(ms));
             }}
             
             public static C_pointer<{name}> array(MemorySession session, int n){{
@@ -189,6 +198,10 @@ import java.lang.invoke.MethodHandle;
             public static <E> C_pointer<E> alloc(MemorySession session){
                 return new C_pointer<E>(session.allocate(ValueLayout.ADDRESS));
             }
+            
+            public static <E> C_pointer<E> from(MemorySession session, MemorySegment ms){{
+                return new C_pointer<E>(session.allocate(ms.byteSize()).copyFrom(ms));
+            }}
 
             public static <E> C_pointer<C_pointer<E>> array(MemorySession session, int n){
                 return new C_pointer<C_pointer<E>>(session.allocateArray((MemoryLayout)ValueLayout.ADDRESS, n));
@@ -271,6 +284,8 @@ import java.lang.invoke.MethodHandle;
 
         logging.info("Generating Java variables")
         for macro in sorted(info['macros'], key=lambda m: m['name']):
+            if not macro['var']:
+                continue
             c_type = macro['type']
             c_source.write(self._c_dec(c_type, 'J_' + macro['name']))
             c_source.write(' = ' + macro['name'] + ';\n')
