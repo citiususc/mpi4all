@@ -109,7 +109,7 @@ External functions cannot use data inside java heap. The example shows how to us
 GO
 ^^
 
-``C_int`` and ``int`` data types are usually aliases but it is preferable to use ``C_int`` to avoid surprises. Functions with ``void *`` arguments use usafe.pointer instead, you can use the auxiliary functions ``mpi.P`` and ``mpi.PA`` to convert variables and array respectively to ``usafe.pointer``. All other pointers are converted to their equivalents in Go, ``&var`` or ``&array[0]`` is sufficient to send the memory address.
+``C_int`` and ``int`` data types are usually aliases but it is preferable to use ``C_int`` to avoid surprises. Functions with ``void *`` arguments use ``usafe.pointer`` instead, you can use the auxiliary functions ``mpi.P`` and ``mpi.PA`` to convert variables and array respectively to ``usafe.pointer``. All other pointers are converted to their equivalents in Go, ``&var`` or ``&array[0]`` is sufficient to send the memory address.
 
 .. code-block:: go
 
