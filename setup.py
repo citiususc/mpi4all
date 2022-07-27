@@ -9,7 +9,7 @@ setuptools.setup(
     version=version.__version__,
     author="cesarpomar",
     author_email="cesaralfredo.pineiro@usc.es",
-    description='MPI4All: A script to generate mpi wrappers',
+    description='MPI4All: A script to generate mpi binding',
     long_description=long_description,
     url="https://github.com/citiususc/mpi4all",
     packages=setuptools.find_packages(),

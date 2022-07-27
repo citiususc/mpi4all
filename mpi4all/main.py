@@ -11,7 +11,7 @@ from mpi4all.version import __version__
 
 
 def cli():
-    parser = argparse.ArgumentParser(prog='mpi4all', description='A script to generate mpi wrappers')
+    parser = argparse.ArgumentParser(prog='mpi4all', description='A script to generate mpi bindings')
     parser.add_argument('--out', dest='out', action='store', metavar='path',
                         help='output folder, by default is working directory', default='./')
     parser.add_argument('--log', dest='log', action='store', metavar='lvl', choices=['info', 'warn', 'error'],
@@ -24,10 +24,10 @@ def cli():
                           help='path of g++ binary, by default use the g++ in PATH', default='g++')
     p_parser.add_argument('--mpi', dest='mpi', action='store', metavar='path',
                           help='force a directory to search for mpi.h', default=None)
-    p_parser.add_argument('--exclude', dest='exclude', action='store', metavar='path', nargs='+', default=[],
+    p_parser.add_argument('--exclude', dest='exclude', action='store', metavar='str', nargs='+', default=[],
                           help='exclude functions and macros that match with any pattern')
     p_parser.add_argument('--enable-fortran', dest='fortran', action='store_true',
-                          help='enable mpi fortran functions disabled by default to avoid linking errors '
+                          help='enable mpi fortran functions disabled by default to avoid linking errors, '
                                'if they are not available', default=False)
     p_parser.add_argument('--no-arg-names', dest='no_arg_names', action='store_true',
                           help='use xi as param name in mpi functions', default=False)
@@ -45,7 +45,7 @@ def cli():
                            help='Disable utility functions that require go 1.18+', default=True)
 
     go_parser.add_argument('--go-package', dest='go_package', action='store', metavar='name',
-                           help='Go package name, default (mpi)', default='mpi')
+                           help='Go package name, default mpi', default='mpi')
     go_parser.add_argument('--go-out', dest='go_out', action='store', metavar='name',
                            help='Go output directory, by default <out>', default=None)
 
@@ -57,12 +57,12 @@ def cli():
     java_parser.add_argument('--java-class', dest='java_class', action='store', metavar='name',
                              help='Java class name, default Mpi', default='Mpi')
     java_parser.add_argument('--java-out', dest='java_out', action='store', metavar='name',
-                             help='Java output directory, by default <out>', default=None)
+                             help='Java output directory, default <out>', default=None)
     java_parser.add_argument('--java-lib-name', dest='java_lib_name', action='store', metavar='name',
                              help='Java C library name without any extension, default mpi4alljava',
                              default='mpi4alljava')
     java_parser.add_argument('--java-lib-out', dest='java_lib_out', action='store', metavar='name',
-                             help='Java output directory for C library, by default <java-out>/<java-lib-name>',
+                             help='Java output directory for C library, default <java-out>/<java-lib-name>',
                              default=None)
 
     parser.add_argument("--version", action='version', version=str(__version__))

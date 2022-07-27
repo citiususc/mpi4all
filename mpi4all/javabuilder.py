@@ -158,7 +158,7 @@ import java.lang.invoke.MethodHandle;
             }}
             
             public C_pointer<{name}> pointer(MemorySession session){{
-                return new C_pointer(ms);
+                return new C_pointer<{name}>(ms);
             }}
             
             public static {name} alloc(MemorySession session){{
