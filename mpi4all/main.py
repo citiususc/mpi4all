@@ -32,9 +32,9 @@ def cli():
     p_parser.add_argument('--no-arg-names', dest='no_arg_names', action='store_true',
                           help='use xi as param name in mpi functions', default=False)
     p_parser.add_argument('--dump', dest='dump', action='store', metavar='path', default=None,
-                          help='dump parser output, - for stdout')
+                          help='dump parser output as specification file, - for stdout')
     p_parser.add_argument('--load', dest='load', action='store', metavar='path', default=None,
-                          help='ignore parser and load info from a dump file, - for stdin')
+                          help='ignore parser and load info from a specification file, - for stdin')
     p_parser.add_argument('--cache', dest='cache', action='store', metavar='path', default=None,
                           help='make --dump if the file does not exist and --load otherwise')
 

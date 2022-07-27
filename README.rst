@@ -28,8 +28,7 @@ You can install MPI4All using pip::
 Dependencies
 ------------
 
-* `Python <https://www.python.org/>`_ 3.8+ 
-  and `PyPy <https://www.pypy.org/>`_.
+* `Python <https://www.python.org/>`_ 3.8+
 
 * An MPI implementation, Java requires building shared/dynamic
   libraries.
@@ -52,7 +51,11 @@ MPI4All can generate the bindings for **Java** and **Go** with the default MPI l
 
  $ mpi4all --go --java
 
+or using a specification file::
 
+ $ mpi4all --load mpich-4.0.json --go --java
+
+Specification files can be generated with ``--dump`` or downloaded from the `releases <https://github.com/citiususc/mpi4all/releases>`_ section.
 
 Java
 ^^^^
@@ -159,7 +162,7 @@ Usage
 .. code-block:: shell
 
     usage: mpi4all [-h] [--out path] [--log lvl] [--gcc path] [--g++ path]
-                   [--mpi path] [--exclude path [path ...]] [--enable-fortran]
+                   [--mpi path] [--exclude str [str ...]] [--enable-fortran]
                    [--no-arg-names] [--dump path] [--load path] [--cache path]
                    [--go] [--no-generic] [--go-package name] [--go-out name]
                    [--java] [--java-package name] [--java-class name]
@@ -184,9 +187,9 @@ Usage
       --enable-fortran      enable mpi fortran functions disabled by default to
                             avoid linking errors, if they are not available
       --no-arg-names        use xi as param name in mpi functions
-      --dump path           dump parser output, - for stdout
-      --load path           ignore parser and load info from a dump file, - for
-                            stdin
+      --dump path           dump parser output as specification file, - for stdout
+      --load path           ignore parser and load info from a specification file,
+                            - for stdin
       --cache path          make --dump if the file does not exist and --load
                             otherwise
 
