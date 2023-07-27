@@ -51,7 +51,7 @@ def cli():
 
     java_parser = parser.add_argument_group('Java builder arguments')
     java_parser.add_argument('--java', dest='java', action='store_true',
-                             help='enable Java (19+) generator')
+                             help='enable Java 21 generator')
     java_parser.add_argument('--java-package', dest='java_package', action='store', metavar='name',
                              help='Java package name, default org.mpi', default='org.mpi')
     java_parser.add_argument('--java-class', dest='java_class', action='store', metavar='name',

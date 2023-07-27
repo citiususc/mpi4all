@@ -12,7 +12,7 @@ cp -R /java/* /test/java
 
 find /test -name '*.java' >  /test/java/sources
 
-javac --enable-preview --release 19 @/test/java/sources
+javac --enable-preview --release 21 @/test/java/sources
 cd /test/java/mpi4alljava
 make
 cp *.so /usr/lib/

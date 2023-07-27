@@ -35,9 +35,9 @@ Dependencies
 
 Tested with:
 
-* `MPICH <https://www.mpich.org/>`_: 3.1.4, 3.2.1, 3.3.2, 3.4.3, 4.0, 4.1a1
+* `MPICH <https://www.mpich.org/>`_: 3.1.4, 3.2.1, 3.3.2, 3.4.3, 4.0, 4.1
 
-* `Open MPI <https://www.open-mpi.org/>`_: 4.0.7, 4.1.4, 5.0.0rc7
+* `Open MPI <https://www.open-mpi.org/>`_: 4.0.7, 4.1.4, 5.0.0rc12
 
 --------
 Examples
@@ -60,42 +60,40 @@ Specification files can be generated with ``--dump`` or downloaded from the `rel
 Java
 ^^^^
 
-External functions cannot use data inside java heap. The example shows how to use ``ByteBuffer.allocateDirect`` and ``MemorySession`` to allocate memory outside the java heap.
+External functions cannot use data inside java heap. The example shows how to use ``ByteBuffer.allocateDirect`` and ``Arena`` to allocate memory outside the java heap.
 
-.. code-block:: java
-
-    import org.mpi.Mpi;
+.. code-block::
 
     import java.lang.foreign.*;
     import java.nio.ByteBuffer;
     import java.nio.IntBuffer;
 
+    import org.mpi.Mpi;
+
     public class Main {
-
-
         public static void main(String[] args) throws Throwable {
             Mpi.MPI_Init(Mpi.C_pointer.NULL.cast(), Mpi.MPI_ARGVS_NULL);
 
             int rank;
             int size;
 
-            IntBuffer buffer = ByteBuffer.allocateDirect(4).asIntBuffer();
+            IntBuffer buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize()).asIntBuffer();
 
             Mpi.MPI_Comm_rank(Mpi.MPI_COMM_WORLD, new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)));
             rank = buffer.get(0);
-            try (MemorySession s = MemorySession.openConfined()) {
-                Mpi.C_int c_size = Mpi.C_int.alloc(s);
-                Mpi.MPI_Comm_size(Mpi.MPI_COMM_WORLD, c_size.pointer(s));
+            try (Arena arena = Arena.ofConfined()) {// Using confined arena
+                Mpi.C_int c_size = Mpi.C_int.alloc(arena);
+                Mpi.MPI_Comm_size(Mpi.MPI_COMM_WORLD, c_size.pointer(arena));
                 size = c_size.get();
             }
 
-            buffer = ByteBuffer.allocateDirect(4 * size).asIntBuffer();
-            try (MemorySession s = MemorySession.openConfined()) {
-                Mpi.C_int c_rank = Mpi.C_int.alloc(s);
-                c_rank.set(rank);
-                Mpi.MPI_Allgather(c_rank.pointer(s).cast(), 1, Mpi.MPI_INT,
-                        new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), size, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
-            }
+            buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize() * size).asIntBuffer();
+
+            Mpi.C_int c_rank = Mpi.C_int.alloc(); // Using auto gc arena
+            c_rank.set(rank);
+            Mpi.MPI_Allgather(c_rank.pointer().cast(), 1, Mpi.MPI_INT,
+                    new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), size, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
+
 
             for (int i = 0; i < size; i++) {
                 if (i != buffer.get(i)) {
@@ -200,7 +198,7 @@ Usage
       --go-out name         Go output directory, by default <out>
 
     Java builder arguments:
-      --java                enable Java (19+) generator
+      --java                enable Java 21 generator
       --java-package name   Java package name, default org.mpi
       --java-class name     Java class name, default Mpi
       --java-out name       Java output directory, default <out>

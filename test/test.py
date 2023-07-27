@@ -4,8 +4,8 @@ import os
 
 TEST_D = os.path.abspath(os.getcwd())
 WD = os.path.join(TEST_D, 'result')
-MPICH_VERSIONS = ['3.1.4', '3.2.1', '3.3.2', '3.4.3', '4.0', '4.1a1']
-OMPI_VERSIONS = ['4.0.7', '4.1.4', '5.0.0rc7']
+MPICH_VERSIONS = ['3.1.4', '3.2.1', '3.3.2', '3.4.3', '4.0', '4.1']
+OMPI_VERSIONS = ['4.0.7', '4.1.4', '5.0.0rc12']
 
 
 def test(name, f):
@@ -75,7 +75,7 @@ def java_builder(path):
 
 def java_test(path):
     java = os.path.join(TEST_D, 'java')
-    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', java + ':/java', 'openjdk:19-slim-buster',
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', java + ':/java', 'openjdk:21-slim-buster',
          '/java/test.sh'])
 
 

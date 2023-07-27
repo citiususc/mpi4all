@@ -69,16 +69,24 @@ class JavaBuilder(BaseBuilder):
         private static MemoryLayout layout(int n){{
             return MemoryLayout.structLayout(MemoryLayout.sequenceLayout(n, ValueLayout.JAVA_BYTE));
         }}
+        
+        private static MethodHandle findMethod(String name, FunctionDescriptor function){{
+            java.util.Optional<MemorySegment> ms = lib.find(name);
+            if (ms.isEmpty()){{
+                return null;
+            }}
+            return linker.downcallHandle(ms.get(), function);
+        }}
                 
         public static class Type {{
             public final MemorySegment ms;
             
             Type(String n, int sz) {{ 
-                this(lib.lookup(n).get(), sz);
+                this(lib.find(n).get(), sz);
             }}
             
             Type(MemorySegment ms, int sz){{
-                this(MemorySegment.ofAddress(ms.address(), sz, MemorySession.global()));
+                this(ms.reinterpret(sz, Arena.ofAuto(), null));
             }}
             
             Type(MemorySegment ms){{
@@ -96,13 +104,21 @@ class JavaBuilder(BaseBuilder):
 
         public static class C_string extends C_pointer<C_char>{{
                 
-            public C_string(MemorySession session, int n){{
-                super(C_char.array(session, n).ms);
+            public C_string(Arena a, int n){{
+                super(C_char.array(a, n).ms);
             }}
             
-            public C_string(MemorySession session, String v){{
-                this(session, v.length() + 1);
+            public C_string(int n){{
+                super(C_char.array(n).ms);
+            }}
+            
+            public C_string(Arena a, String v){{
+                this(a, v.length() + 1);
                 setString(v);
+            }}
+            
+            public C_string(String v){{
+                this(Arena.ofAuto(), v);
             }}
             
             public String getString(){{
@@ -153,88 +169,104 @@ import java.lang.invoke.MethodHandle;
                 super(n, (int){layout}.byteSize());
             }}
             
+            public static int byteSize(){{
+                return (int){layout}.byteSize();
+            }}
+            
             public {name}(MemorySegment ms){{
                 super(ms);
             }}
             
-            public C_pointer<{name}> pointer(MemorySession session){{
+            public C_pointer<{name}> pointer(){{
                 return new C_pointer<{name}>(ms);
             }}
             
-            public static {name} alloc(MemorySession session){{
-                return new {name}(session.allocate({layout}));
+            public C_pointer<{name}> pointer(Arena a){{
+                return new C_pointer<{name}>(ms);
             }}
             
-            public static {name} from(MemorySession session, MemorySegment ms){{
-                return new {name}(session.allocate(ms.byteSize()).copyFrom(ms));
+            public static {name} alloc(Arena a){{
+                return new {name}(a.allocate({layout}));
             }}
             
-            public static C_pointer<{name}> array(MemorySession session, int n){{
-                return new C_pointer<{name}>(session.allocateArray((MemoryLayout){layout}, n));
+            public static {name} alloc(){{
+                return alloc(Arena.ofAuto());
+            }}
+            
+            public static {name} from(Arena a, MemorySegment ms){{
+                return new {name}(a.allocate(ms.byteSize()).copyFrom(ms));
+            }}
+            
+            public static {name} from(MemorySegment ms){{
+                return from(Arena.ofAuto(), ms);
+            }}
+            
+            public static C_pointer<{name}> array(Arena a, int n){{
+                return new C_pointer<{name}>(a.allocateArray((MemoryLayout){layout}, n));
+            }}
+            
+            public static C_pointer<{name}> array(int n){{
+                return array(Arena.ofAuto(), n);
             }}
         }}\n\n"""
 
         pointer_template = """
         public static class C_pointer<E> extends Type{
 
-            public final static C_pointer<Void> NULL = of(MemorySession.global(), MemoryAddress.NULL);
+            public final static C_pointer<Void> NULL = new C_pointer(MemorySegment.NULL);
 
             public C_pointer(String n){
-                super(n, (int)ValueLayout.ADDRESS.byteSize());
+                super(n, 0);
             }
 
             public C_pointer(MemorySegment ms){
                 super(ms);
             }
             
-            public C_pointer<C_pointer<E>> pointer(MemorySession session){
-                return of(session, ms.address());
+            public C_pointer<C_pointer<E>> pointer(Arena a){
+                MemorySegment p = a.allocate(ValueLayout.ADDRESS);
+                p.set(ValueLayout.ADDRESS, 0, ms);
+                return new C_pointer<>(p);
+            }
+            
+            public C_pointer<C_pointer<E>> pointer(){
+                return pointer(Arena.ofAuto());
             }
             
             public <E2> C_pointer<E2> cast(){
                 return new C_pointer<E2>(ms);
             }
-
-            public static <E> C_pointer<E> alloc(MemorySession session){
-                return new C_pointer<E>(session.allocate(ValueLayout.ADDRESS));
+            
+            public static <E> C_pointer<E> from(Arena a, MemorySegment ms){
+                return new C_pointer<E>(ms);
             }
             
-            public static <E> C_pointer<E> from(MemorySession session, MemorySegment ms){{
-                return new C_pointer<E>(session.allocate(ms.byteSize()).copyFrom(ms));
-            }}
-
-            public static <E> C_pointer<C_pointer<E>> array(MemorySession session, int n){
-                return new C_pointer<C_pointer<E>>(session.allocateArray((MemoryLayout)ValueLayout.ADDRESS, n));
+            public static <E> C_pointer<E> from(MemorySegment ms){
+                return from(Arena.ofAuto(), ms);
             }
             
-            public MemoryAddress getAddress(){
-                return ms.get(ValueLayout.ADDRESS, 0);
-            }
-            
-            public void setAddress(MemoryAddress a){
-                ms.set(ValueLayout.ADDRESS, 0, a);
-            }
-        
-            static C_pointer of(MemorySession session, MemoryAddress address){
-                C_pointer p = alloc(session);
-                p.ms.set(ValueLayout.ADDRESS, 0, address);
-                return p;
+            public MemorySegment getAddress(){
+                return ms.reinterpret((int)ValueLayout.ADDRESS.byteSize(), Arena.ofAuto(), null).get(ValueLayout.ADDRESS, 0);
             }
             
         }\n\n"""
 
         pt_template = class_template[:-4] + """
             public {type} get(){{
-                return ({type})ms.address().get({layout}, 0);
+                return ({type})ms.get({layout}, 0);
             }} 
             
             public void set({type} v ){{
-                ms.address().set({layout}, 0, v);
+                ms.set({layout}, 0, v);
             }} 
                        
-            public static C_pointer<{name}> arrayOf(MemorySession session, {type}...e){{
-                return new C_pointer<{name}>(session.allocateArray({layout}, e));
+            public static C_pointer<{name}> arrayOf(Arena a, {type}...e){{
+                return new C_pointer<{name}>(a.allocateArray({layout}, e));
             }}  
+                       
+            public static C_pointer<{name}> arrayOf({type}...e){{
+                return arrayOf(Arena.ofAuto(), e);
+            }} 
         }}\n\n"""
 
         for key, value in sorted(classes.items(), key=lambda p: p[0]):
@@ -351,8 +383,8 @@ import java.lang.invoke.MethodHandle;
         for fun in sorted(info['functions'], key=lambda f: f['name']):
             j_call = "C_" + fun['name'].upper()
             j_types.write(' ' * 4)
-            j_types.write('private static final MethodHandle ' + j_call + ' = linker.downcallHandle(')
-            j_types.write('lib.lookup("' + fun['name'] + '").get(), FunctionDescriptor.of(')
+            j_types.write('private static final MethodHandle ' + j_call + ' = findMethod(')
+            j_types.write('"' + fun['name'] + '", FunctionDescriptor.of(')
 
             j_source.write(' ' * 4)
             j_source.write('public static ')
