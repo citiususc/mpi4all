@@ -62,7 +62,7 @@ Java
 
 External functions cannot use data inside java heap. The example shows how to use ``ByteBuffer.allocateDirect`` and ``Arena`` to allocate memory outside the java heap.
 
-.. code-block::
+.. code-block:: java
 
     import java.lang.foreign.*;
     import java.nio.ByteBuffer;
