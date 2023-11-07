@@ -13,35 +13,33 @@ from mpi4all.version import __version__
 def cli():
     parser = argparse.ArgumentParser(prog='mpi4all', description='A script to generate mpi bindings')
     parser.add_argument('--out', dest='out', action='store', metavar='path',
-                        help='output folder, by default is working directory', default='./')
+                        help='Output folder, by default is working directory', default='./')
     parser.add_argument('--log', dest='log', action='store', metavar='lvl', choices=['info', 'warn', 'error'],
-                        default='error', help='log level, default error')
+                        default='error', help='Log level, default error')
 
     p_parser = parser.add_argument_group('Mpi parser arguments')
-    p_parser.add_argument('--gcc', dest='gcc', action='store', metavar='path',
-                          help='path of gcc binary, by default use the gcc in PATH', default="gcc")
-    p_parser.add_argument('--g++', dest='gpp', action='store', metavar='path',
-                          help='path of g++ binary, by default use the g++ in PATH', default='g++')
-    p_parser.add_argument('--mpi', dest='mpi', action='store', metavar='path',
-                          help='force a directory to search for mpi.h', default=None)
+    p_parser.add_argument('--cc', dest='cc', action='store', metavar='path',
+                          help='MPI C compiler, by default uses the \'mpicc\' in PATH', default="mpicc")
+    p_parser.add_argument('--cxx', dest='cxx', action='store', metavar='path',
+                          help='MPI C++ compiler, by default uses the \'mpic++\' in PATH', default='mpic++')
     p_parser.add_argument('--exclude', dest='exclude', action='store', metavar='str', nargs='+', default=[],
-                          help='exclude functions and macros that match with any pattern')
+                          help='Exclude functions and macros that match with any pattern')
     p_parser.add_argument('--enable-fortran', dest='fortran', action='store_true',
-                          help='enable mpi fortran functions disabled by default to avoid linking errors, '
+                          help='Parse MPI Fortran functions, which are disabled by default, to avoid linking errors '
                                'if they are not available', default=False)
     p_parser.add_argument('--no-arg-names', dest='no_arg_names', action='store_true',
-                          help='use xi as param name in mpi functions', default=False)
+                          help='Use xi as the parameter name in MPI functions', default=False)
     p_parser.add_argument('--dump', dest='dump', action='store', metavar='path', default=None,
-                          help='dump parser output as specification file, - for stdout')
+                          help='Dump parser output as json file, - for stdout')
     p_parser.add_argument('--load', dest='load', action='store', metavar='path', default=None,
-                          help='ignore parser and load info from a specification file, - for stdin')
+                          help='Don\'t use a parser and load info from a JSON file, - for stdin')
     p_parser.add_argument('--cache', dest='cache', action='store', metavar='path', default=None,
-                          help='make --dump if the file does not exist and --load otherwise')
+                          help='Make --dump if the file does not exist and --load otherwise')
 
     go_parser = parser.add_argument_group('Go builder arguments')
     go_parser.add_argument('--go', dest='go', action='store_true',
-                           help='enable Go generator')
-    go_parser.add_argument('--no-generic', dest='gogeneric', action='store_false',
+                           help='Enable Go generator')
+    go_parser.add_argument('--no-generic', dest='go_generic', action='store_false',
                            help='Disable utility functions that require go 1.18+', default=True)
 
     go_parser.add_argument('--go-package', dest='go_package', action='store', metavar='name',
@@ -51,7 +49,7 @@ def cli():
 
     java_parser = parser.add_argument_group('Java builder arguments')
     java_parser.add_argument('--java', dest='java', action='store_true',
-                             help='enable Java 21 generator')
+                             help='Enable Java 21 generator')
     java_parser.add_argument('--java-package', dest='java_package', action='store', metavar='name',
                              help='Java package name, default org.mpi', default='org.mpi')
     java_parser.add_argument('--java-class', dest='java_class', action='store', metavar='name',
@@ -96,9 +94,8 @@ def main():
                     mpi_info = json.load(file)
         else:
             mpi_info = MpiParser(
-                gcc=args.gcc,
-                gpp=args.gpp,
-                mpih=args.mpi,
+                cc=args.cc,
+                cxx=args.cxx,
                 exclude_list=args.exclude,
                 get_func_args=not args.no_arg_names
             ).parse()
@@ -114,7 +111,7 @@ def main():
             logging.info("Generating Go source")
             GoBuilder(
                 package=args.go_package,
-                generic=args.gogeneric,
+                generic=args.go_generic,
                 out=args.go_out if args.go_out else args.out,
             ).build(mpi_info)
             logging.info("Go source Ready")

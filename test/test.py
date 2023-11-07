@@ -55,7 +55,9 @@ def build_ompi(name, v):
 
 
 def parser(path):
-    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', 'mpi4all', '--mpi', '/mpi/include', '--dump', '/mpi/f.json'])
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', 'mpi4all',
+         '--cc', 'gcc -I /mpi/include',
+         '--cxx', 'g++ -I /mpi/include', '--dump', '/mpi/f.json'])
 
 
 def go_builder(path):

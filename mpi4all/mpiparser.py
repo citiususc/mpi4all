@@ -9,9 +9,9 @@ import logging
 class MpiParser:
     CAST_RE = re.compile(r'^\(?\((MPI_\w+[ *]*)\)|OMPI_PREDEFINED_GLOBAL\([ ]*(MPI_\w+[ *]*)')
 
-    def __init__(self, gcc, gpp, mpih, exclude_list, get_func_args):
-        self._gcc = [gcc, '-I' + mpih] if mpih else [gcc]
-        self._gpp = [gpp, '-I' + mpih] if mpih else [gpp]
+    def __init__(self, cc, cxx, exclude_list, get_func_args):
+        self._cc = cc.split()
+        self._cxx = cxx.split()
         self._exclude_patterns = list(map(lambda e: re.compile(e), exclude_list))
         self._get_func_args = get_func_args
         self._types = dict()
@@ -19,21 +19,21 @@ class MpiParser:
 
         try:
             logging.info('Checking C compiler')
-            self._run(self._gcc + ['--version'])
+            self._run(self._cc + ['--version'])
             logging.info('C compiler OK')
         except subprocess.CalledProcessError as ex:
-            raise RuntimeError(self._gcc[0] + ' not found')
+            raise RuntimeError(self._cc[0] + ' not found')
 
         try:
             logging.info('Checking C++ compiler')
-            self._run(self._gpp + ['--version'])
+            self._run(self._cxx + ['--version'])
             logging.info('C++ compiler OK')
         except subprocess.CalledProcessError as ex:
-            raise RuntimeError(self._gpp[0] + ' not found')
+            raise RuntimeError(self._cxx[0] + ' not found')
 
         try:
             logging.info('Checking header mpi.h')
-            self._run(self._gcc + ['-dM', '-E', '-include', 'mpi.h', '-'])
+            self._run(self._cc + ['-dM', '-E', '-include', 'mpi.h', '-'])
             logging.info('Header mpi.h OK')
         except subprocess.CalledProcessError as ex:
             raise RuntimeError('mpi.h not found')
@@ -74,11 +74,11 @@ class MpiParser:
             file.flush()
 
         try:
-            self._run(self._gpp + ['-fpermissive', cpp, '-o', bin])
+            self._run(self._cxx + ['-fpermissive', cpp, '-o', bin])
             typename, bytes = self._run([bin]).stdout.split('\n')[:2]
 
             i = 'auto x = ' + name + ';'
-            if self._run(self._gpp + ['--shared', '-include', 'mpi.h', '-o', '/dev/null', '-x', 'c++', '-'],
+            if self._run(self._cxx + ['--shared', '-include', 'mpi.h', '-o', '/dev/null', '-x', 'c++', '-'],
                          check=False, input=i).returncode == 0:
                 var = True
             else:
@@ -140,7 +140,7 @@ class MpiParser:
 
     def _parse_macros(self, wd):
         logging.info('getting macros')
-        macro_dump = self._run(self._gcc + ['-dM', '-E', '-include', 'mpi.h', '-']).stdout
+        macro_dump = self._run(self._cc + ['-dM', '-E', '-include', 'mpi.h', '-']).stdout
         with ThreadPoolExecutor() as workers:
             logging.info('parsing macros')
             all_macros = workers.map(lambda m: self._parse_macro(m, wd), macro_dump.split('\n'))
@@ -175,7 +175,7 @@ class MpiParser:
     def _parse_funcs(self, wd):
         func_file = os.path.join(wd, 'func.X')
         self._run(
-            self._gcc + ['-x', 'c', '-shared', '-o', '/dev/null', '-aux-info', func_file, '-include', 'mpi.h', '-'])
+            self._cc + ['-x', 'c', '-shared', '-o', '/dev/null', '-aux-info', func_file, '-include', 'mpi.h', '-'])
 
         with open(func_file) as file:
             func_dump = file.readlines()
@@ -239,7 +239,7 @@ class MpiParser:
                 functions.append(f)
 
         if self._get_func_args:
-            name_info = self._run(self._gcc + ['-E', '-include', 'mpi.h', '-']).stdout
+            name_info = self._run(self._cc + ['-E', '-include', 'mpi.h', '-']).stdout
             for f in functions:
                 try:
                     start = name_info.index(f['name'] + '(')
