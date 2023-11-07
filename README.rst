@@ -159,46 +159,45 @@ Usage
 
 .. code-block:: shell
 
-    usage: mpi4all [-h] [--out path] [--log lvl] [--gcc path] [--g++ path]
-                   [--mpi path] [--exclude str [str ...]] [--enable-fortran]
-                   [--no-arg-names] [--dump path] [--load path] [--cache path]
-                   [--go] [--no-generic] [--go-package name] [--go-out name]
-                   [--java] [--java-package name] [--java-class name]
-                   [--java-out name] [--java-lib-name name] [--java-lib-out name]
-                   [--version]
+    usage: mpi4all [-h] [--out path] [--log lvl] [--cc path] [--cxx path]
+                   [--exclude str [str ...]] [--enable-fortran] [--no-arg-names]
+                   [--dump path] [--load path] [--cache path] [--go]
+                   [--no-generic] [--go-package name] [--go-out name] [--java]
+                   [--java-package name] [--java-class name] [--java-out name]
+                   [--java-lib-name name] [--java-lib-out name] [--version]
 
     A script to generate mpi bindings
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
-      --out path            output folder, by default is working directory
-      --log lvl             log level, default error
+      --out path            Output folder, by default is working directory
+      --log lvl             Log level, default error
       --version             show program's version number and exit
 
     Mpi parser arguments:
-      --gcc path            path of gcc binary, by default use the gcc in PATH
-      --g++ path            path of g++ binary, by default use the g++ in PATH
-      --mpi path            force a directory to search for mpi.h
+      --cc path             MPI C compiler, by default uses the 'mpicc' in PATH
+      --cxx path            MPI C++ compiler, by default uses the 'mpic++' in PATH
       --exclude str [str ...]
-                            exclude functions and macros that match with any
+                            Exclude functions and macros that match with any
                             pattern
-      --enable-fortran      enable mpi fortran functions disabled by default to
-                            avoid linking errors, if they are not available
-      --no-arg-names        use xi as param name in mpi functions
-      --dump path           dump parser output as specification file, - for stdout
-      --load path           ignore parser and load info from a specification file,
-                            - for stdin
-      --cache path          make --dump if the file does not exist and --load
+      --enable-fortran      Parse MPI Fortran functions, which are disabled by
+                            default, to avoid linking errors if they are not
+                            available
+      --no-arg-names        Use xi as the parameter name in MPI functions
+      --dump path           Dump parser output as json file, - for stdout
+      --load path           Don't use a parser and load info from a JSON file, -
+                            for stdin
+      --cache path          Make --dump if the file does not exist and --load
                             otherwise
 
     Go builder arguments:
-      --go                  enable Go generator
+      --go                  Enable Go generator
       --no-generic          Disable utility functions that require go 1.18+
       --go-package name     Go package name, default mpi
       --go-out name         Go output directory, by default <out>
 
     Java builder arguments:
-      --java                enable Java 21 generator
+      --java                Enable Java 21 generator
       --java-package name   Java package name, default org.mpi
       --java-class name     Java class name, default Mpi
       --java-out name       Java output directory, default <out>
