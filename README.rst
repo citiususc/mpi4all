@@ -157,7 +157,7 @@ GO
 Usage
 -----
 
-.. code-block:: shell
+.. code-block::
 
     usage: mpi4all [-h] [--out path] [--log lvl] [--cc path] [--cxx path]
                    [--exclude str [str ...]] [--enable-fortran] [--no-arg-names]
