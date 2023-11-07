@@ -78,7 +78,7 @@ class MpiParser:
             typename, bytes = self._run([bin]).stdout.split('\n')[:2]
 
             i = 'auto x = ' + name + ';'
-            if self._run(self._cxx + ['--shared', '-include', 'mpi.h', '-o', '/dev/null', '-x', 'c++', '-'],
+            if self._run(self._cxx + ['-shared', '-fPIC', '-include', 'mpi.h', '-o', '/dev/null', '-x', 'c++', '-'],
                          check=False, input=i).returncode == 0:
                 var = True
             else:

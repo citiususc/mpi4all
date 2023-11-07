@@ -102,8 +102,13 @@ class GoBuilder(BaseBuilder):
         logging.info("Generating GO variables")
         for macro in sorted(info['macros'], key=lambda m: m['name']):
             if not macro['var']:
-                c_source.write('typedef ' + macro['name'] + '\n #undef ' + macro['name'])
-                c_source.write('\n ' + macro['name'] + ';\n')
+                if macro['type'][-1] == ')' and macro['type'][0] != '(':
+                    c_source.write('typedef ' + macro['type'].replace('(', '(*GO_' + macro['name'] + ')(', 1) + ';\n')
+                else:
+                    c_source.write('typedef ' + macro['type'] + ' GO_' + macro['name'] + ';\n')
+                go_type, dec = self._typeAsGo('GO_' + macro['name'])
+                if dec is not None:
+                    self._declare(dec.replace('GO_', '', 1), go_types, go_types_dec)
                 continue
             c_type = macro['type']
             c_source.write(self._c_dec(c_type, 'GO_' + macro['name']))
