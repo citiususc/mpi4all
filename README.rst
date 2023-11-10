@@ -77,7 +77,9 @@ External functions cannot use data inside java heap. The example shows how to us
             int rank;
             int size;
 
-            IntBuffer buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize()).asIntBuffer();
+            // When the buffer is interpreted by the MPI function, the native order must be used.
+            // If the MPI function only sends or receives the buffer, the order is indifferent.
+            ByteBuffer buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize()).order(ByteOrder.nativeOrder());
 
             Mpi.MPI_Comm_rank(Mpi.MPI_COMM_WORLD, new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)));
             rank = buffer.get(0);
@@ -87,12 +89,12 @@ External functions cannot use data inside java heap. The example shows how to us
                 size = c_size.get();
             }
 
-            buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize() * size).asIntBuffer();
+            buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize() * size);
 
             Mpi.C_int c_rank = Mpi.C_int.alloc(); // Using auto gc arena
             c_rank.set(rank);
             Mpi.MPI_Allgather(c_rank.pointer().cast(), 1, Mpi.MPI_INT,
-                    new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), size, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
+                    new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), 1, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
 
 
             for (int i = 0; i < size; i++) {
