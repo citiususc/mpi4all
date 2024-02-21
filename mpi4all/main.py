@@ -11,13 +11,13 @@ from mpi4all.version import __version__
 
 
 def cli():
-    parser = argparse.ArgumentParser(prog='mpi4all', description='A script to generate mpi bindings')
+    parser = argparse.ArgumentParser(prog='mpi4all', description='An MPI Binding Generator')
     parser.add_argument('--out', dest='out', action='store', metavar='path',
                         help='Output folder, by default is working directory', default='./')
     parser.add_argument('--log', dest='log', action='store', metavar='lvl', choices=['info', 'warn', 'error'],
                         default='error', help='Log level, default error')
 
-    p_parser = parser.add_argument_group('Mpi parser arguments')
+    p_parser = parser.add_argument_group('Mpi Parser arguments')
     p_parser.add_argument('--cc', dest='cc', action='store', metavar='path',
                           help='MPI C compiler, by default uses the \'mpicc\' in PATH', default="mpicc")
     p_parser.add_argument('--cxx', dest='cxx', action='store', metavar='path',
@@ -36,9 +36,9 @@ def cli():
     p_parser.add_argument('--cache', dest='cache', action='store', metavar='path', default=None,
                           help='Make --dump if the file does not exist and --load otherwise')
 
-    go_parser = parser.add_argument_group('Go builder arguments')
+    go_parser = parser.add_argument_group('Go Generator arguments')
     go_parser.add_argument('--go', dest='go', action='store_true',
-                           help='Enable Go generator')
+                           help='Enable Go Generator')
     go_parser.add_argument('--no-generic', dest='go_generic', action='store_false',
                            help='Disable utility functions that require go 1.18+', default=True)
 
@@ -47,9 +47,9 @@ def cli():
     go_parser.add_argument('--go-out', dest='go_out', action='store', metavar='name',
                            help='Go output directory, by default <out>', default=None)
 
-    java_parser = parser.add_argument_group('Java builder arguments')
+    java_parser = parser.add_argument_group('Java Generator arguments')
     java_parser.add_argument('--java', dest='java', action='store_true',
-                             help='Enable Java 21 generator')
+                             help='Enable Java 21 Generator')
     java_parser.add_argument('--java-package', dest='java_package', action='store', metavar='name',
                              help='Java package name, default org.mpi', default='org.mpi')
     java_parser.add_argument('--java-class', dest='java_class', action='store', metavar='name',
@@ -63,7 +63,7 @@ def cli():
                              help='Java output directory for C library, default <java-out>/<java-lib-name>',
                              default=None)
 
-    parser.add_argument("--version", action='version', version=str(__version__))
+    parser.add_argument("--version", action='version', version=__version__)
 
     args = parser.parse_args(['-h'] if len(sys.argv) == 1 else None)
 

@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "mpi4all"
+version = "1.1.1"
+description = "MPI4All: An MPI Binding Generator"
+license = "LGPL-3.0-only"
+authors = [
+    "César Pomar <cesaralfredo.pineiro@usc.es>",
+    "Juan C. Pichel <juancarlos.pichel@usc.es>"
+]
+readme = "README.rst"
+repository = "https://github.com/citiususc/mpi4all"
+keywords = ["HPC", "MPI", "Multi-language", "Programming models"]
+classifiers = [
+    "Topic :: Software Development",
+    "Topic :: Utilities"
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.scripts]
+mpi4all = 'mpi4all.main:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

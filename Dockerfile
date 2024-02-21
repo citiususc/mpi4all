@@ -11,9 +11,7 @@ RUN apt update && \
 COPY . /tmp/mpi4all
 
 RUN cd /tmp/mpi4all && \
-	python3 setup.py install && \
+	python3 -m pip install . && \
 	rm -fR /tmp/mpi4all
-
-RUN mpi4all -h
 
 ENTRYPOINT ["/usr/local/bin/mpi4all"]
