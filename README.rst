@@ -28,7 +28,7 @@ You can install MPI4All using pip::
 Dependencies
 ------------
 
-* `Python <https://www.python.org/>`_ 3.8+
+* `Python <https://www.python.org/>`_ 3.9+
 
 * An MPI implementation, Java requires building shared/dynamic
   libraries.
