@@ -1,6 +1,6 @@
-==========================================
-MPI4All: A script to generate mpi bindings
-==========================================
+==================================================================
+MPI4All: Universal Binding Generation for MPI Parallel Programming
+==================================================================
 
 --------
 Overview
@@ -30,14 +30,15 @@ Dependencies
 
 * `Python <https://www.python.org/>`_ 3.9+
 
-* An MPI implementation, Java requires building shared/dynamic
-  libraries.
+* An MPI Library
 
 Tested with:
 
 * `MPICH <https://www.mpich.org/>`_: 3.1.4, 3.2.1, 3.3.2, 3.4.3, 4.0, 4.1
 
 * `Open MPI <https://www.open-mpi.org/>`_: 4.0.7, 4.1.4, 5.0.0rc12
+
+* `Intel MPI <https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html>`_: 2021.10.0
 
 --------
 Examples
