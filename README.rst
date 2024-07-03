@@ -6,15 +6,19 @@ MPI4All: Universal Binding Generation for MPI Parallel Programming
 Overview
 --------
 
-This package provides a Python script to parse and generate bindings for *Message Passing
-Interface* (`MPI <https://www.mpi-forum.org/>`_) standard. The parser analyzes the MPI headers and generates a specification file with the defined macros, functions and types. The specification file is different for each version and implementation of MPI, the file can be stored to generate binding without using the parser.
+This package provides a Python script to parse and generate bindings for the *Message Passing
+Interface* (`MPI <https://www.mpi-forum.org/>`_) standard. The parser analyzes the MPI headers and generates a specification file with the defined macros, functions and types. The specification file is different for each version and implementation of MPI, which can be stored to generate bindings without using the parser.
 
-We can currently generate bindings for Java and Go. Java makes use of Foreign Linker API and Foreign Memory Access API so the performance is significantly better than Java Native Interface (JNI) implementations. Go use cgo, so MPI headers are needed to compile. More languages may be added in the future, feel free to make a pull request.
+As case studies, we can currently generate bindings for Java and Go. Java makes use of Foreign Linker API and Foreign Memory Access API so the performance is significantly better than Java Native Interface (JNI) implementations. Go use cgo, so MPI headers are needed to compile. More languages may be added in the future, so feel free to make a pull request.
 
-The objective of the project is to create efficient bindings for MPI automatically. The project will never become an object oriented interface like `mpi4py <https://github.com/mpi4py/mpi4py/>`_, although an equivalent library could be built using our bindings.
+The goal of the project is to create efficient bindings for MPI automatically. The project will never become an object oriented interface like `mpi4py <https://github.com/mpi4py/mpi4py/>`_, although an equivalent library could be built using our bindings.
 
 
-MPI4All has been built in the field of the `IgnisHPC <https://github.com/ignishpc/>`_ project for  MPI usage.
+MPI4All has been built in the field of the `IgnisHPC <https://github.com/ignishpc/>`_ project for MPI usage.
+
+I you use MPI4All, please cite:
+
+César Piñeiro, Álvaro Vázquez and Juan C. Pichel. `MPI4All: Universal Binding Generation for MPI Parallel Programming <https://doi.org/10.1007/978-3-031-63749-0_14>`_. 24th Int. Conference on Computational Science (ICCS). LNCS 14832, pp. 196–208, 2024.
 
 -------
 Install
