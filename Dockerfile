@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster
+FROM python:3.12.7-bookworm
 
 RUN apt update && \
 	apt -y install \

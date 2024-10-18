@@ -25,8 +25,7 @@ public class Main {
 
         buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize() * size).asIntBuffer();
 
-        Mpi.C_int c_rank = Mpi.C_int.alloc(); // Using auto gc arena
-        c_rank.set(rank);
+        Mpi.C_int c_rank = new Mpi.C_int(rank); // Using auto gc arena
         Mpi.MPI_Allgather(c_rank.pointer().cast(), 1, Mpi.MPI_INT,
                 new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), size, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
 

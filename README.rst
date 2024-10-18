@@ -91,8 +91,7 @@ External functions cannot use data inside java heap. The example shows how to us
 
             buffer = ByteBuffer.allocateDirect(Mpi.C_int.byteSize() * size);
 
-            Mpi.C_int c_rank = Mpi.C_int.alloc(); // Using auto gc arena
-            c_rank.set(rank);
+            Mpi.C_int c_rank = new Mpi.C_int(0); // Using auto gc arena
             Mpi.MPI_Allgather(c_rank.pointer().cast(), 1, Mpi.MPI_INT,
                     new Mpi.C_pointer<>(MemorySegment.ofBuffer(buffer)), 1, Mpi.MPI_INT, Mpi.MPI_COMM_WORLD);
 

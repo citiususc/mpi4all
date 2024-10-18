@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mpi4all"
-version = "1.1.1"
+version = "1.2"
 description = "MPI4All: An MPI Binding Generator"
 license = "LGPL-3.0-only"
 authors = [

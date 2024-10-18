@@ -1,5 +1,5 @@
 
-FROM debian:buster-slim
+FROM ubuntu:22.04
 
 ARG OMPI_VERSION=4.1.4
 ARG OMPI_PATH=/usr

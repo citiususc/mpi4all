@@ -1,5 +1,5 @@
 
-FROM debian:buster-slim
+FROM ubuntu:22.04
 
 ARG MPICH_VERSION=3.4.3
 ARG MPICH_PATH=/usr

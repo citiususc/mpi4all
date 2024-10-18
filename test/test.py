@@ -4,8 +4,8 @@ import os
 
 TEST_D = os.path.abspath(os.getcwd())
 WD = os.path.join(TEST_D, 'result')
-MPICH_VERSIONS = ['3.1.4', '3.2.1', '3.3.2', '3.4.3', '4.0', '4.1']
-OMPI_VERSIONS = ['4.0.7', '4.1.4', '5.0.0rc12']
+MPICH_VERSIONS = ['3.2.1', '3.3.2', '3.4.3', '4.0', '4.1.3', '4.2.3']
+OMPI_VERSIONS = ['4.0.7', '4.1.4', '5.0.5']
 
 
 def test(name, f):
@@ -60,32 +60,44 @@ def parser(path):
          '--cxx', 'g++ -I /mpi/include', '--dump', '/mpi/f.json'])
 
 
-def go_builder(path):
+def go_generator(path):
     cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', 'mpi4all', '--load', '/mpi/f.json', '--out', '/mpi/go',
          '--go'])
 
 
 def go_test(path):
     go = os.path.join(TEST_D, 'go')
-    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', go + ':/src', 'golang:1.18.4-buster', '/src/test.sh'])
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', go + ':/src', 'golang:1.22-bookworm', '/src/test.sh'])
 
 
-def java_builder(path):
+def java21_generator(path):
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', 'mpi4all', '--load', '/mpi/f.json', '--out', '/mpi/java21',
+         '--jdk21','--java'])
+
+
+def java21_test(path):
+    java = os.path.join(TEST_D, 'java')
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', java + ':/java', 'eclipse-temurin:21-jdk-jammy',
+         '/java/test21.sh'])
+
+def java_generator(path):
     cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', 'mpi4all', '--load', '/mpi/f.json', '--out', '/mpi/java',
          '--java'])
 
 
 def java_test(path):
     java = os.path.join(TEST_D, 'java')
-    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', java + ':/java', 'openjdk:21-slim-buster',
+    cmd(['docker', 'run', '--rm', '-v', path + ':/mpi', '-v', java + ':/java', 'eclipse-temurin:23-jdk-noble',
          '/java/test.sh'])
 
 
 def common_tests(name, path):
     test(name + ' parser', lambda: parser(path))
-    test(name + ' go builder', lambda: go_builder(path))
+    test(name + ' go generator', lambda: go_generator(path))
     test(name + ' go build and test', lambda: go_test(path))
-    test(name + ' java builder', lambda: java_builder(path))
+    test(name + ' java21 generator', lambda: java21_generator(path))
+    test(name + ' java21 build and test', lambda: java21_test(path))
+    test(name + ' java generator', lambda: java_generator(path))
     test(name + ' java build and test', lambda: java_test(path))
 
 
