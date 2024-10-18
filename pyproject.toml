@@ -19,7 +19,7 @@ classifiers = [
 python = "^3.9"
 
 [tool.poetry.scripts]
-mpi4all = 'mpi4all.main:main'
+mpi4all = 'mpi4all.__main__:main'
 
 [build-system]
 requires = ["poetry-core"]
