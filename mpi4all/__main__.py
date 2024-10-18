@@ -39,7 +39,7 @@ def parse_args():
     go_gen = cli.add_argument_group('Go Generator Arguments')
     go_gen.add_argument('--go', dest='go', action='store_true',
                         help='Enable Go Generator')
-    go_gen.add_argument('--no-generic', dest='go_generic', action='store_false', default=True,
+    go_gen.add_argument('--go-no-generic', dest='go_generic', action='store_false', default=True,
                         help='Disable utility functions that require go 1.18+')
     go_gen.add_argument('--go-package', dest='go_package', action='store', metavar='name', default='mpi',
                         help='Go package name, default mpi')

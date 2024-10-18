@@ -167,7 +167,7 @@ Usage
 
     usage: mpi4all [-h] [--out path] [--log lvl] [--cc path] [--cxx path]
                    [--exclude str [str ...]] [--enable-fortran] [--dump path]
-                   [--load path] [--cache path] [--go] [--no-generic]
+                   [--load path] [--cache path] [--go] [--go-no-generic]
                    [--go-package name] [--go-out name] [--java] [--jdk21]
                    [--java-package name] [--java-class name] [--java-out name]
                    [--java-lib-name name] [--java-lib-out name] [--version]
@@ -197,7 +197,7 @@ Usage
 
     Go Generator Arguments:
       --go                  Enable Go Generator
-      --no-generic          Disable utility functions that require go 1.18+
+      --go-no-generic       Disable utility functions that require go 1.18+
       --go-package name     Go package name, default mpi
       --go-out name         Go output directory, by default <out>
 
