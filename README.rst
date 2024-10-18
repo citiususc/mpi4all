@@ -38,9 +38,9 @@ Dependencies
 
 Tested with:
 
-* `MPICH <https://www.mpich.org/>`_: 3.1.4, 3.2.1, 3.3.2, 3.4.3, 4.0, 4.1
+* `MPICH <https://www.mpich.org/>`_: 3.2.1, 3.3.2, 3.4.3, 4.0, 4.1.3, 4.2.3
 
-* `Open MPI <https://www.open-mpi.org/>`_: 4.0.7, 4.1.4, 5.0.0rc12
+* `Open MPI <https://www.open-mpi.org/>`_: 4.0.7, 4.1.4, 5.0.5
 
 * `Intel MPI <https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html>`_: 2021.10.0
 
@@ -166,48 +166,49 @@ Usage
 .. code-block::
 
     usage: mpi4all [-h] [--out path] [--log lvl] [--cc path] [--cxx path]
-                   [--exclude str [str ...]] [--enable-fortran] [--no-arg-names]
-                   [--dump path] [--load path] [--cache path] [--go]
-                   [--no-generic] [--go-package name] [--go-out name] [--java]
+                   [--exclude str [str ...]] [--enable-fortran] [--dump path]
+                   [--load path] [--cache path] [--go] [--no-generic]
+                   [--go-package name] [--go-out name] [--java] [--jdk21]
                    [--java-package name] [--java-class name] [--java-out name]
                    [--java-lib-name name] [--java-lib-out name] [--version]
 
-    A script to generate mpi bindings
+    Universal Binding Generation for MPI Parallel Programming
 
     options:
       -h, --help            show this help message and exit
-      --out path            Output folder, by default is working directory
+      --out path, -o path   Place output in folder, by default is working
+                            directory
       --log lvl             Log level, default error
       --version             show program's version number and exit
 
-    Mpi parser arguments:
-      --cc path             MPI C compiler, by default uses the 'mpicc' in PATH
-      --cxx path            MPI C++ compiler, by default uses the 'mpic++' in PATH
+    Parser Arguments:
+      --cc path             MPI C compiler, by default search in PATH
+      --cxx path            MPI C++ compiler, by default search in PATH
       --exclude str [str ...]
                             Exclude functions and macros that match with any
                             pattern
       --enable-fortran      Parse MPI Fortran functions, which are disabled by
                             default, to avoid linking errors if they are not
                             available
-      --no-arg-names        Use xi as the parameter name in MPI functions
-      --dump path           Dump parser output as json file, - for stdout
-      --load path           Don't use a parser and load info from a JSON file, -
-                            for stdin
-      --cache path          Make --dump if the file does not exist and --load
+      --dump path           Save blueprint as json file, - for stdout
+      --load path           Disable parser and load a blueprint, - for stdin
+      --cache path          Make --dump if the blueprint does not exist and --load
                             otherwise
 
-    Go builder arguments:
-      --go                  Enable Go generator
+    Go Generator Arguments:
+      --go                  Enable Go Generator
       --no-generic          Disable utility functions that require go 1.18+
       --go-package name     Go package name, default mpi
       --go-out name         Go output directory, by default <out>
 
-    Java builder arguments:
-      --java                Enable Java 21 generator
+    Java Generator Arguments:
+      --java                Enable Java Generator
+      --jdk21               Use JDK 21 preview instead of Java 22+ Generator
       --java-package name   Java package name, default org.mpi
       --java-class name     Java class name, default Mpi
       --java-out name       Java output directory, default <out>
-      --java-lib-name name  Java C library name without any extension, default
-                            mpi4alljava
+      --java-lib-name name  Java native library name without any extension,
+                            default mpi4all
       --java-lib-out name   Java output directory for C library, default <java-
                             out>/<java-lib-name>
+
