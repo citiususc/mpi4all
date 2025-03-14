@@ -16,7 +16,7 @@ The goal of the project is to create efficient bindings for MPI automatically. T
 
 MPI4All has been built in the field of the `IgnisHPC <https://github.com/ignishpc/>`_ project for MPI usage.
 
-I you use MPI4All, please cite:
+If you use MPI4All, please cite:
 
 - César Piñeiro, Álvaro Vázquez and Juan C. Pichel. `Towards Universal MPI Bindings for Enhanced New Language Support <https://doi.org/10.1016/j.jocs.2025.102557>`_. Journal of Computational Science, 2025.
 
