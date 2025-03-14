@@ -18,7 +18,9 @@ MPI4All has been built in the field of the `IgnisHPC <https://github.com/ignishp
 
 I you use MPI4All, please cite:
 
-César Piñeiro, Álvaro Vázquez and Juan C. Pichel. `MPI4All: Universal Binding Generation for MPI Parallel Programming <https://doi.org/10.1007/978-3-031-63749-0_14>`_. 24th Int. Conference on Computational Science (ICCS). LNCS 14832, pp. 196–208, 2024.
+- César Piñeiro, Álvaro Vázquez and Juan C. Pichel. `Towards Universal MPI Bindings for Enhanced New Language Support <https://doi.org/10.1016/j.jocs.2025.102557>`_. Journal of Computational Science, 2025.
+
+- César Piñeiro, Álvaro Vázquez and Juan C. Pichel. `MPI4All: Universal Binding Generation for MPI Parallel Programming <https://doi.org/10.1007/978-3-031-63749-0_14>`_. 24th Int. Conference on Computational Science (ICCS). LNCS 14832, pp. 196–208, 2024.
 
 -------
 Install
